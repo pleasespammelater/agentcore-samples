@@ -14,6 +14,7 @@ export class DockerImageStack extends cdk.Stack {
 
         const asset = new ecr_assets.DockerImageAsset(this, `${props.appName}-AppImage`, {
             directory: path.join(__dirname, "../../../"), // path to root of the project
+            platform: ecr_assets.Platform.LINUX_ARM64,
         });
 
         this.imageUri = asset.imageUri;
