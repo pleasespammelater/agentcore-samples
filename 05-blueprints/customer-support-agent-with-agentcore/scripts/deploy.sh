@@ -22,8 +22,18 @@ echo "==> Pre-flight checks"
 check_cmd uv       "Install: https://docs.astral.sh/uv/getting-started/installation/"
 check_cmd node     "Install nvm (https://github.com/nvm-sh/nvm#installing-and-updating), then run: nvm install 20 && nvm use 20"
 check_cmd npm      "Comes with Node.js"
-check_cmd docker   "Install: https://docs.docker.com/desktop/setup/install/mac-install/"
+check_cmd docker   "Install: https://docs.docker.com/get-started/get-docker/"
 check_cmd aws      "Install: https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html"
+
+# CDK invokes `docker build`; require Buildx and enable BuildKit so image
+# sources (including COPY --from) are resolved for the ARM64 target platform.
+if ! docker buildx version &>/dev/null; then
+    echo "ERROR: Docker Buildx is missing or broken. ARM64 builds require BuildKit." >&2
+    echo "       Install: https://docs.docker.com/build/install-buildx/" >&2
+    echo "       On Ubuntu/Debian with Docker's apt repository: sudo apt-get install docker-buildx-plugin" >&2
+    exit 1
+fi
+export DOCKER_BUILDKIT=1
 
 # Verify AWS CLI version >= 2.32.0 (required for `aws login`)
 REQUIRED_CLI_VERSION="2.32.0"

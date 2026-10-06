@@ -43,10 +43,10 @@ A production-ready AI customer support agent built on **Amazon Bedrock AgentCore
 |------|---------|---------|
 | **uv** (Python + packages) | Latest | [Install guide](https://docs.astral.sh/uv/getting-started/installation/) |
 | **Node.js** | 20+ | First install [nvm](https://github.com/nvm-sh/nvm#installing-and-updating), then run: `nvm install 20 && nvm use 20` |
-| **Docker** | Latest | [Docker Desktop](https://docs.docker.com/desktop/setup/install/mac-install/) |
+| **Docker + Buildx** | Latest; BuildKit enabled | [Docker](https://docs.docker.com/get-started/get-docker/) and [Buildx](https://docs.docker.com/build/install-buildx/) |
 | **AWS CLI** | **v2.32.0+** | [Install guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) |
 
-> **Tip:** `scripts/deploy.sh` runs pre-flight checks for all of the above — tools, CLI version, AWS credentials, Docker, and Bedrock model access — and will warn you with actionable guidance if anything is missing.
+> **Tip:** `scripts/deploy.sh` runs pre-flight checks for all of the above — tools, CLI version, AWS credentials, Docker/Buildx, and Bedrock model access — and enables BuildKit for CDK's ARM64 image build.
 
 ### AWS Credentials & Permissions
 
@@ -253,6 +253,7 @@ The key takeaway: the agent can be jailbroken, the model can hallucinate, but th
 | Token script fails to open browser | Copy the URL from terminal output and open manually |
 | "Unauthorized" when invoking | Token expired (1 hour). Re-run `eval $(uv run scripts/cognito-user.py --login --export)` |
 | CDK deploy fails | Ensure Docker is running. Check credentials: `aws sts get-caller-identity` |
+| Docker build reports `linux/amd64` does not match `linux/arm64` and warns about the legacy builder | Install or repair [Docker Buildx](https://docs.docker.com/build/install-buildx/) and rerun `scripts/deploy.sh`, which enables BuildKit. For direct CDK deployments, run `DOCKER_BUILDKIT=1 npm run cdk:deploy:ci` from `cdk/`. |
 | Runtime creation fails with incompatible container architecture | AgentCore Runtime requires `linux/arm64`. The CDK image asset sets this platform explicitly; on x86 hosts, Docker needs ARM64 build support. If the AgentCore stack is in `ROLLBACK_COMPLETE`, delete that failed stack in CloudFormation, wait for deletion, then rerun `scripts/deploy.sh`. |
 | `node -v` shows version < 20 | Install Node 20+: `nvm install 20 && nvm use 20` |
 | Port 3000 in use (token script) | Kill the process: `lsof -ti:3000 \| xargs kill` |
