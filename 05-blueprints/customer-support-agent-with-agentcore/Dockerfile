@@ -11,14 +11,12 @@ ENV UV_SYSTEM_PYTHON=1 \
 
 
 
-COPY pyproject.toml pyproject.toml
-# Install from requirements file
-RUN uv pip install -r pyproject.toml
+COPY pyproject.toml uv.lock ./
+# Install the same dependency versions used locally, excluding development tools.
+RUN uv export --frozen --no-dev --no-emit-project --format requirements-txt --output-file /tmp/requirements.txt \
+    && uv pip install -r /tmp/requirements.txt
 
 
-
-
-RUN uv pip install aws-opentelemetry-distro==0.12.2
 
 
 # Signal that this is running in Docker for host binding logic
