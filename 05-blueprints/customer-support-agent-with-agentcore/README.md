@@ -253,6 +253,7 @@ The key takeaway: the agent can be jailbroken, the model can hallucinate, but th
 | Token script fails to open browser | Copy the URL from terminal output and open manually |
 | "Unauthorized" when invoking | Token expired (1 hour). Re-run `eval $(uv run scripts/cognito-user.py --login --export)` |
 | CDK deploy fails | Ensure Docker is running. Check credentials: `aws sts get-caller-identity` |
+| Runtime creation fails with incompatible container architecture | AgentCore Runtime requires `linux/arm64`. The CDK image asset sets this platform explicitly; on x86 hosts, Docker needs ARM64 build support. If the AgentCore stack is in `ROLLBACK_COMPLETE`, delete that failed stack in CloudFormation, wait for deletion, then rerun `scripts/deploy.sh`. |
 | `node -v` shows version < 20 | Install Node 20+: `nvm install 20 && nvm use 20` |
 | Port 3000 in use (token script) | Kill the process: `lsof -ti:3000 \| xargs kill` |
 

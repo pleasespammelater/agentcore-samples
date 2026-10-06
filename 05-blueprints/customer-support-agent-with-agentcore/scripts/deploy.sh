@@ -150,7 +150,7 @@ agents:
     entrypoint: ./src/main.py
     deployment_type: container
     runtime_type: null
-    platform: linux/amd64
+    platform: linux/arm64
     container_runtime: null
     source_path: ./src
     aws:
